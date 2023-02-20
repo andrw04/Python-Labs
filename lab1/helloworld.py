@@ -6,13 +6,16 @@
 # two numbers and operation(string like “add”, “sub”,
 # “mult” and “div”) and returns the result of this
 # operation with two given arguments;
+#
+#   -creates a list of numbers and returns a list of
+# even numbers in this list.
 print("Hello world")
 
 
 def math_operation(num1, num2, operation):
     """
     Function which takes two numbers and operation
-    and return the result of this operation.
+    and returns the result of this operation.
     """
     operation = operation.lower()
 
@@ -28,3 +31,7 @@ def math_operation(num1, num2, operation):
         print("Incorrect operation!")
 
     return None
+
+
+num_list = list(range(0,10)) # list of 1, 2, ..., 9
+even_nums = [i for i in num_list if i % 2 == 0 and i != 0] # even in num_list
