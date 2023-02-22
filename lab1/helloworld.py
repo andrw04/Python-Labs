@@ -34,4 +34,4 @@ def math_operation(num1, num2, operation):
 
 
 num_list = list(range(0,10)) # list of 1, 2, ..., 9
-even_nums = [i for i in num_list if i % 2 == 0 and i != 0] # even in num_list
+even_nums = [i for i in num_list if i % 2 == 0] # even in num_list
