@@ -1,0 +1,7 @@
+FROM python
+
+WORKDIR /home/andrey/Документы/Python labs/lab1
+
+COPY . .
+
+CMD ["python", "helloworld.py"]
