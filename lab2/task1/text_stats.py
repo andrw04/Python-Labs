@@ -69,7 +69,7 @@ def average_sentence_length(text):
 
 def top_repeated(text,k=10, n=4):
     words = get_all_words(text)
-    words = [word for word in words if len(word) == 4]
+    words = [word for word in words if len(word) == n]
 
     word_count = {}
 
@@ -88,15 +88,16 @@ def top_repeated(text,k=10, n=4):
             break
         
         top_k_repeated[key] = value
+        k -= 1
 
     return top_k_repeated
 
 
 def main():
-    path = 'lab2/task1/text.txt'
+    path = 'text.txt'
     text = read_file(path)
     count = average_word_length(text)
-    print(amount_non_declarative(text))
+    print(top_repeated(text, k=5, n=4))
 
 
 if __name__ == '__main__':
