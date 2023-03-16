@@ -48,7 +48,15 @@ def average_word_length(text):
 
 
 def average_sentence_length(text):
-    pass
+    sentences = get_all_sentences(text)
+    average = 0
+
+    for sentence in sentences:
+        average += len(sentence)
+
+    average /= len(sentences)
+    
+    return average
 
 
 def top_repeated(text,k=10, n=4):
@@ -80,7 +88,7 @@ def main():
     path = 'text.txt'
     text = read_file(path)
     count = average_word_length(text)
-    print(amount_sentences(text))
+    print(average_sentence_length(text))
 
 
 if __name__ == '__main__':
