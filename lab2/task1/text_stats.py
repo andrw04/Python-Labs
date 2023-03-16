@@ -1,5 +1,6 @@
 from collections import namedtuple
 from functools import reduce
+import re
 
 
 def read_file(path):
@@ -20,6 +21,11 @@ def get_all_words(text):
     words = [word.lower() for word in words if is_word(word)]
 
     return words
+
+
+def get_all_sentences(text):
+    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
+    print(sentences)
 
 
 def amount_sentences(text):
@@ -77,7 +83,7 @@ def main():
     path = 'text.txt'
     text = read_file(path)
     count = average_word_length(text)
-    print(top_repeated(text))
+    print(get_all_sentences('ajkhkj khjhgjkhg. akjfgkhjd etc. khskjdf.'))
     #print(count)
 
 
