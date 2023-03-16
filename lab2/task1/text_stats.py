@@ -25,11 +25,14 @@ def get_all_words(text):
 
 def get_all_sentences(text):
     sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
-    print(sentences)
+
+    return sentences
 
 
 def amount_sentences(text):
-    pass
+    sentences = get_all_sentences(text)
+
+    return len(sentences)
 
 
 def amount_non_declarative(text):
@@ -73,18 +76,11 @@ def top_repeated(text,k=10, n=4):
     return top_k_repeated
 
 
-
-def calculate(text):
-    pass
-
-
-
 def main():
     path = 'text.txt'
     text = read_file(path)
     count = average_word_length(text)
-    print(get_all_sentences('ajkhkj khjhgjkhg. akjfgkhjd etc. khskjdf.'))
-    #print(count)
+    print(amount_sentences(text))
 
 
 if __name__ == '__main__':
