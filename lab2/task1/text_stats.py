@@ -17,7 +17,7 @@ def is_word(text):
 def get_all_words(text):
     words = text.split(' ')
     words = [word.strip(r',.:;?!\'"(){}') for word in words]
-    words = [word for word in words if is_word(word)]
+    words = [word.lower() for word in words if is_word(word)]
 
     return words
 
@@ -43,7 +43,29 @@ def average_sentence_length(text):
 
 
 def top_repeated(text,k=10, n=4):
-    pass
+    words = get_all_words(text)
+    words = [word for word in words if len(word) == 4]
+
+    word_count = {}
+
+    for word in words:
+        if word not in word_count.keys():
+            word_count[word] = 1
+        else:
+            word_count[word] += 1
+    
+    sorted_word = sorted(word_count.items(), key=lambda x: x[1], reverse=True)
+
+    top_k_repeated = {}
+
+    for key, value in sorted_word:
+        if k == 0:
+            break
+        
+        top_k_repeated[key] = value
+
+    return top_k_repeated
+
 
 
 def calculate(text):
@@ -52,10 +74,11 @@ def calculate(text):
 
 
 def main():
-    path = 'lab2/task1/text.txt'
+    path = 'text.txt'
     text = read_file(path)
     count = average_word_length(text)
-    print(count)
+    print(top_repeated(text))
+    #print(count)
 
 
 if __name__ == '__main__':
