@@ -1,14 +1,16 @@
-from collections import namedtuple
+import os
 from functools import reduce
 import re
 
 
 def read_file(path):
-    text = ''
-    with open(path, 'r') as file:
-        text = file.read()
-
-    return text
+    if os.path.exists(path):
+        text = ''
+        with open(path, 'r') as file:
+            text = file.read()
+        return text
+    else:
+        return None
 
 
 def is_word(text):
@@ -36,7 +38,13 @@ def amount_sentences(text):
 
 
 def amount_non_declarative(text):
-    pass
+    sentences = get_all_sentences(text)
+    count = 0
+    for sentence in sentences:
+        if '!' not in sentence and '?' not in sentence:
+            count += 1
+
+    return count
 
 
 def average_word_length(text):
@@ -85,10 +93,10 @@ def top_repeated(text,k=10, n=4):
 
 
 def main():
-    path = 'text.txt'
+    path = 'lab2/task1/text.txt'
     text = read_file(path)
     count = average_word_length(text)
-    print(average_sentence_length(text))
+    print(amount_non_declarative(text))
 
 
 if __name__ == '__main__':
