@@ -96,8 +96,14 @@ def top_repeated(text,k=10, n=4):
 def main():
     path = 'text.txt'
     text = read_file(path)
-    count = average_word_length(text)
-    print(top_repeated(text, k=5, n=4))
+    sent_amount = amount_sentences(text)
+    non_declarative = amount_non_declarative(text)
+    av_w_len = average_word_length(text)
+    av_sent_len = average_sentence_length(text)
+    print(f"Amount of sentences: {sent_amount}")
+    print(f"Amount of non-declarative sentences: {non_declarative}")
+    print(f"Average word length: {av_w_len}")
+    print(f"Average senteces length: {av_sent_len}")
 
 
 if __name__ == '__main__':
