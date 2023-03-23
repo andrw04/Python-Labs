@@ -41,7 +41,7 @@ def amount_non_declarative(text):
     sentences = get_all_sentences(text)
     count = 0
     for sentence in sentences:
-        if '!' not in sentence and '?' not in sentence:
+        if '!' in sentence or '?' in sentence:
             count += 1
 
     return count
@@ -49,6 +49,8 @@ def amount_non_declarative(text):
 
 def average_word_length(text):
     words = get_all_words(text)
+    if not len(words):
+        return 0
 
     all_word_length = reduce(lambda a, b: a + len(b), words, 0)
 
@@ -94,7 +96,9 @@ def top_repeated(text,k=10, n=4):
 
 
 def main():
-    path = 'text.txt'
+    abs_file_path = os.path.abspath(__file__)
+    path, file_name = os.path.split(abs_file_path)
+    path = os.path.join(path, 'text.txt')
     text = read_file(path)
     sent_amount = amount_sentences(text)
     non_declarative = amount_non_declarative(text)
