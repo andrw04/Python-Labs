@@ -62,7 +62,9 @@ def average_sentence_length(text):
     average = 0
 
     for sentence in sentences:
-        average += len(sentence)
+        words = get_all_words(sentence)
+        for word in words:
+            average += len(word)
 
     average /= len(sentences)
     
