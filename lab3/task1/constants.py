@@ -1,4 +1,5 @@
 import types
+from enum import Enum
 
 
 INT_TYPE = int
@@ -21,3 +22,8 @@ DICT_TYPE = dict
 SET_TYPE = set
 FROZENSET_TYPE = frozenset
 BYTEARRAY_TYPE = bytearray
+
+
+class Serializer(Enum):
+    Json = 1,
+    Xml = 2

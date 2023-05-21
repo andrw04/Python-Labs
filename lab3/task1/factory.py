@@ -1,14 +1,10 @@
-from enum import Enum
+from constants import Serializer
 
 class MyJson:
     pass
 
 class MyXML:
     pass
-
-class Serializer(Enum):
-    Json = 1,
-    Xml = 2
 
 
 class Factory:

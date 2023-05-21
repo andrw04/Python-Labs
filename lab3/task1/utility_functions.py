@@ -138,9 +138,10 @@ def class_data(obj : CLASS_TYPE):
     result = {"type": "class"}
     result = {"__name__": obj.__name__}
 
-    # TODO#1 Base classes
+    bases = tuple(b for b in obj.__bases__ if b != object)
 
     # TODO#2 Dictionary of options
+
 
 
 def create_class(dictionary : DICT_TYPE):
