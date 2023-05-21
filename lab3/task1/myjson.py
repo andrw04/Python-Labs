@@ -1,7 +1,12 @@
-def dumps(obj):
-    return serialize_dictionary(obj)
+class MyJson:
+    def dump():
+        pass
 
+    def dumps():
+        pass
 
-def serialize_dictionary(obj):
-    pass
+    def load():
+        pass
 
+    def loads():
+        pass
