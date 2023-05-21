@@ -1,19 +1,14 @@
 from constants import Serializer
-
-class MyJson:
-    pass
-
-class MyXML:
-    pass
+from myjson import MyJson
+from myxml import MyXml
 
 
 class Factory:
-    
+
     @staticmethod
-    def create_serializer(serialized : Serializer):
+    def create_serializer(serializer: Serializer):
         if Serializer.Json:
             return MyJson()
-        
+
         elif Serializer.Xml:
-            return MyXML()
-        
+            return MyXml()

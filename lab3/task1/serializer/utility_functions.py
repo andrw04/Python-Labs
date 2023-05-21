@@ -1,9 +1,7 @@
-from constants import *
+from constants import CODE_PROPERTIES, UNIQUE_TYPES, TYPE, SOURCE, CODE,\
+    GLOBALS, NAME, DEFAULTS, CLOSURE, BASES, DICT, CLASS
 import inspect
-from types import NoneType, ModuleType, CodeType, FunctionType, \
-    BuiltinFunctionType, CellType, MappingProxyType, \
-    WrapperDescriptorType, MethodDescriptorType,\
-    GetSetDescriptorType
+from types import NoneType, ModuleType, CodeType, FunctionType, CellType
 
 
 class ObjectConverter:
@@ -69,7 +67,7 @@ class ObjectConverter:
 
     @classmethod
     def get_obj_dict(cls, obj):
-        dictionary = {key: value for key, value in obj.__dict__items()}
+        dictionary = {key: value for key, value in obj.__dict__.items()}
         dictionary2 = {}
 
         for key, value in dictionary.items():
@@ -83,6 +81,9 @@ class ObjectConverter:
 
     @classmethod
     def get_code(cls, obj: CodeType):
+        """
+        Returns dictionary of properties necessary to create code object
+        """
         result = {}
 
         for key, value in inspect.getmembers(obj):
@@ -93,6 +94,9 @@ class ObjectConverter:
 
     @classmethod
     def get_routine_dict(cls, obj, is_inner_func):
+        """
+        Returns dictionary of func options
+        """
         result = {}
 
         # Code
@@ -115,14 +119,16 @@ class ObjectConverter:
 
     @classmethod
     def get_class_dict(cls, obj):
+        """
+        Returns dictionary of class options
+        """
         result = {}
 
         # Name
         result[NAME] = cls.get_dict(obj.__name__)
 
         # Bases
-        result[BASES] = cls.get_dict(
-            tuple(base for base in obj.__bases__ if base != object))
+        result[BASES] = cls.get_dict(tuple(base for base in obj.__bases__ if base != object))
 
         # Dict
         result[DICT] = cls.get_obj_dict(obj)
@@ -131,6 +137,9 @@ class ObjectConverter:
 
     @classmethod
     def get_object_dict(cls, obj):
+        """
+        Returns dictionary of object options
+        """
         result = {}
 
         # Class
@@ -143,6 +152,9 @@ class ObjectConverter:
 
     @classmethod
     def get_global_vars(cls, func, is_inner_func):
+        """
+        Returns global variables used by function
+        """
         name = func.__name__
         global_vars = {}
 
@@ -168,7 +180,6 @@ class ObjectConverter:
                     global_vars[var_name] = func.__globals__[var_name]
 
         return global_vars
-    
 
     @classmethod
     def get_object(cls, dictionary, is_dict=False):
@@ -265,13 +276,3 @@ class ObjectConverter:
                 obj.__dict__ = dictionary
 
                 return obj
-
-
-def foo(a=1, b=10):
-    return a + b
-
-
-if __name__ == "__main__":
-    d = ObjectConverter.get_dict(foo)
-    f = ObjectConverter.get_object(d)
-    print(f())
