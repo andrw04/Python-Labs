@@ -16,7 +16,7 @@ class ObjectConverter:
         result = {TYPE: type(obj).__name__}
 
         if type(obj) is dict:
-            result[SOURCE] = [[cls.get_dict(key), value] for key, value in obj.items()]
+            result[SOURCE] = [[cls.get_dict(key), cls.get_dict(value)] for key, value in obj.items()]
             return result
 
         if type(obj) in (set, frozenset, tuple, bytes, bytearray):
@@ -29,8 +29,10 @@ class ObjectConverter:
             return result
 
         if type(obj) is ModuleType:
-            result[SOURCE] = obj.__name__
-            return result
+            # result[SOURCE] = obj.__name__
+            # return result
+            return {TYPE: ModuleType.__name__,
+                    SOURCE: obj.__name__}
 
         if type(obj) is CodeType:
             result[SOURCE] = cls.__get_code_dict(obj)
@@ -205,33 +207,65 @@ class ObjectConverter:
 
         return result
 
+    # @classmethod
+    # def __get_global_vars(cls, func, is_inner_func):
+    #     name = func.__name__
+    #     global_vars = {}
+    #
+    #     for var_name in func.__code__.co_names:
+    #         if var_name in func.__globals__:
+    #             # Module
+    #             if type(func.__globals__[var_name]) is ModuleType:
+    #                 global_vars[var_name] = func.__globals__[var_name]
+    #
+    #             # Class
+    #             elif inspect.isclass(func.__globals__[var_name]):
+    #                 c = func.__globals__[var_name]
+    #
+    #                 if is_inner_func and name in c.__dict__ and func == c.__dict__[name].__func__:
+    #                     global_vars[var_name] = c.__name__
+    #                 else:
+    #                     global_vars[var_name] = c
+    #
+    #             elif var_name == func.__code__.co_name:
+    #                 global_vars[var_name] = func.__name__
+    #
+    #             else:
+    #                 global_vars[var_name] = func.__globals__[var_name]
+    #
+    #     return global_vars
+
     @classmethod
     def __get_global_vars(cls, func, is_inner_func):
         name = func.__name__
-        global_vars = {}
+        gvars = {}
 
-        for var_name in func.__code__.co_names:
-            if var_name in func.__globals__:
+        for gvar_name in func.__code__.co_names:
+            # Separating the variables that the function needs
+            if gvar_name in func.__globals__:
+
                 # Module
-                if type(func.__globals__[var_name]) is ModuleType:
-                    global_vars[var_name] = func.__globals__[var_name]
+                if type(func.__globals__[gvar_name]) is ModuleType:
+                    gvars[gvar_name] = func.__globals__[gvar_name]
 
                 # Class
-                elif inspect.isclass(func.__globals__[var_name]):
-                    c = func.__globals__[var_name]
-
-                    if is_inner_func and name in c.__dict__ and func == c.__dict__[name].__func__:
-                        global_vars[var_name] = c.__name__
+                elif inspect.isclass(func.__globals__[gvar_name]):
+                    # To prevent recursion, the class in which this method is declared is replaced with the
+                    # name of the class. In the future, this name will be replaced by the class type
+                    c = func.__globals__[gvar_name]
+                    if is_inner_func and name in c.__dict__ and func == c.__dict__[name].__func__:  # !!!!
+                        gvars[gvar_name] = c.__name__
                     else:
-                        global_vars[var_name] = c
+                        gvars[gvar_name] = c
 
-                elif var_name == func.__code__.co_name:
-                    global_vars[var_name] = func.__name__
+                # Recursion protection
+                elif gvar_name == func.__code__.co_name:
+                    gvars[gvar_name] = func.__name__
 
                 else:
-                    global_vars[var_name] = func.__globals__[var_name]
+                    gvars[gvar_name] = func.__globals__[gvar_name]
 
-        return global_vars
+        return gvars
 
     @classmethod
     def __get_obj_dict(cls, obj):
