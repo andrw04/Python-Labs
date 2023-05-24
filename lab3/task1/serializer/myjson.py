@@ -1,19 +1,22 @@
-from utility_functions import ObjectConverter
+from .utility_functions import ObjectConverter
 from types import NoneType, ModuleType, CodeType, FunctionType, CellType
 import re
 import regex
-from constants import NULL_LITERAL, INT_PATTERN, FLOAT_PATTERN, BOOL_PATTERN,\
+from .constants import NULL_LITERAL, INT_PATTERN, FLOAT_PATTERN, BOOL_PATTERN,\
     TRUE_LITERAL, STRING_PATTERN, NULL_PATTERN, VALUE_PATTERN
 
 
 class MyJson:
-    def dump(self, obj):
-        json = self.dumps(obj)
-
     def dumps(self, obj) -> str:
         obj = ObjectConverter.get_dict(obj)
 
         return self._dumps(obj)
+
+    def dump(self, obj, source_file):
+        source_file.write(self.dumps(obj))
+
+    def load(self, source_file):
+        return self.loads(source_file.read())
 
     def _dumps(self, obj) -> str:
         if type(obj) in (int, float):
@@ -77,8 +80,6 @@ class MyJson:
             string = string[1:-1]
             matches = regex.findall(VALUE_PATTERN, string)
 
-            # Variable matches will store key-value pairs in one row. Elements with
-            # even indexes are keys, those with odd indexes are values.
             return {self._loads(matches[i][0]):
                     self._loads(matches[i + 1][0]) for i in range(0, len(matches), 2)}
 

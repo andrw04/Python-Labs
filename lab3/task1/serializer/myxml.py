@@ -1,13 +1,19 @@
 import regex
-from utility_functions import ObjectConverter
+from .utility_functions import ObjectConverter
 from types import NoneType
-from constants import FIRST_XML_ELEMENT_PATTERN, XML_ELEMENT_PATTERN, KEY_GROUP_NAME, VALUE_GROUP_NAME, XML_SCHEME_SOURCE
+from .constants import FIRST_XML_ELEMENT_PATTERN, XML_ELEMENT_PATTERN, KEY_GROUP_NAME, VALUE_GROUP_NAME, XML_SCHEME_SOURCE
 
 
 class MyXml:
     def dumps(self, obj) -> str:
         obj = ObjectConverter.get_dict(obj)
         return self._dumps(obj, is_first=True)
+
+    def dump(self, obj, source_file):
+        source_file.write(self.dumps(obj))
+
+    def load(self, source_file):
+        return self.loads(source_file.read())
 
     def _dumps(self, obj, is_first=False) -> str:
         if type(obj) in (int, float, bool, NoneType):
@@ -30,7 +36,7 @@ class MyXml:
             raise ValueError
 
     def loads(self, string: str):
-        obj = self.__loads_to_dict(string, is_first=True)
+        obj = self._loads(string, is_first=True)
         return ObjectConverter.get_object(obj)
 
     def _loads(self, string: str, is_first=False):

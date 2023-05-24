@@ -38,8 +38,6 @@ CODE_PROPERTIES = [prop.__name__ for prop in [
 ]
 
 
-
-
 UNIQUE_TYPES = [
     types.MappingProxyType,
     types.WrapperDescriptorType,

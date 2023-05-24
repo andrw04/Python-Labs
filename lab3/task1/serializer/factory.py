@@ -1,6 +1,6 @@
-from constants import Serializer
-from myjson import MyJson
-from myxml import MyXml
+from .constants import Serializer
+from .myjson import MyJson
+from .myxml import MyXml
 
 
 class Factory:

@@ -1,30 +1,22 @@
-from constants import CODE_PROPERTIES, UNIQUE_TYPES, TYPE, SOURCE, CODE,\
-    GLOBALS, NAME, DEFAULTS, CLOSURE, BASES, DICT, CLASS
+from .constants import CODE_PROPERTIES, UNIQUE_TYPES, TYPE, SOURCE, CODE,\
+    GLOBALS, NAME, DEFAULTS, CLOSURE, BASES, DICT, CLASS, OBJECT
 import inspect
 from types import NoneType, ModuleType, CodeType, FunctionType, CellType
 
 
 class ObjectConverter:
-    """
-    This class provides an opportunity to pack python objects to dictionary
-    which can be used to convinient serialization. So it can convert data
-    from dictionary to different python objects.
-    """
-
     @classmethod
     def get_dict(cls, obj, is_inner_func=False):
         if type(obj) in (int, float, bool, str, NoneType):
             return obj
 
         if type(obj) is list:
-            return [cls.get_dict(elem) for elem in obj]
+            return [cls.get_dict(i) for i in obj]
 
-        result = {}
-        result[TYPE] = type(obj).__name__
+        result = {TYPE: type(obj).__name__}
 
         if type(obj) is dict:
-            result[SOURCE] = [[cls.get_dict(key), cls.get_dict(
-                value)] for key, value in obj.items()]
+            result[SOURCE] = [[cls.get_dict(key), value] for key, value in obj.items()]
             return result
 
         if type(obj) in (set, frozenset, tuple, bytes, bytearray):
@@ -38,11 +30,10 @@ class ObjectConverter:
 
         if type(obj) is ModuleType:
             result[SOURCE] = obj.__name__
-            return
+            return result
 
         if type(obj) is CodeType:
-            source = cls.get_code(obj)
-            result[SOURCE] = source
+            result[SOURCE] = cls.__get_code_dict(obj)
             return result
 
         if type(obj) is CellType:
@@ -54,138 +45,19 @@ class ObjectConverter:
             return result
 
         if inspect.isroutine(obj):
-            result[SOURCE] = cls.get_routine_dict(obj, is_inner_func)
+            result[SOURCE] = cls.__get_routine_dict(obj, is_inner_func)
             return result
 
         elif inspect.isclass(obj):
-            result[SOURCE] = cls.get_class_dict(obj)
+            result[SOURCE] = cls.__get_class_dict(obj)
             return result
 
         else:
-            result[SOURCE] = cls.get_object_dict(obj)
+            result[SOURCE] = cls.__get_object_dict(obj)
             return result
 
     @classmethod
-    def get_obj_dict(cls, obj):
-        dictionary = {key: value for key, value in obj.__dict__.items()}
-        dictionary2 = {}
-
-        for key, value in dictionary.items():
-            if type(value) not in UNIQUE_TYPES:
-                dictionary2[cls.get_dict(key)] = cls.get_dict(
-                    value, is_inner_func=True)
-            else:
-                dictionary2[cls.get_dict(key)] = cls.get_dict(value)
-
-        return dictionary2
-
-    @classmethod
-    def get_code(cls, obj: CodeType):
-        """
-        Returns dictionary of properties necessary to create code object
-        """
-        result = {}
-
-        for key, value in inspect.getmembers(obj):
-            if key in CODE_PROPERTIES:
-                result[key] = cls.get_dict(value)
-
-        return result
-
-    @classmethod
-    def get_routine_dict(cls, obj, is_inner_func):
-        """
-        Returns dictionary of func options
-        """
-        result = {}
-
-        # Code
-        result[CODE] = cls.get_dict(obj.__code__)
-
-        # Global vars
-        global_vars = cls.get_global_vars(obj, is_inner_func)
-        result[GLOBALS] = cls.get_dict(global_vars)
-
-        # Name
-        result[NAME] = cls.get_dict(obj.__name__)
-
-        # Defaults
-        result[DEFAULTS] = cls.get_dict(obj.__defaults__)
-
-        # Closure
-        result[CLOSURE] = cls.get_dict(obj.__closure__)
-
-        return result
-
-    @classmethod
-    def get_class_dict(cls, obj):
-        """
-        Returns dictionary of class options
-        """
-        result = {}
-
-        # Name
-        result[NAME] = cls.get_dict(obj.__name__)
-
-        # Bases
-        result[BASES] = cls.get_dict(tuple(base for base in obj.__bases__ if base != object))
-
-        # Dict
-        result[DICT] = cls.get_obj_dict(obj)
-
-        return result
-
-    @classmethod
-    def get_object_dict(cls, obj):
-        """
-        Returns dictionary of object options
-        """
-        result = {}
-
-        # Class
-        result[CLASS] = cls.get_dict(obj.__class__)
-
-        # Dict
-        result[DICT] = cls.get_object_dict(obj)
-
-        return result
-
-    @classmethod
-    def get_global_vars(cls, func, is_inner_func):
-        """
-        Returns global variables used by function
-        """
-        name = func.__name__
-        global_vars = {}
-
-        for var_name in func.__code__.co_names:
-            if var_name in func.__globals__:
-                # Module
-                if type(func.__globals__[var_name]) is ModuleType:
-                    global_vars[var_name] = func.__globals__[var_name]
-
-                # Class
-                elif inspect.isclass(func.__globals__[var_name]):
-                    c = func.__globals__[var_name]
-
-                    if is_inner_func and name in c.__dict__ and func == c.__dict__[name].__func__:
-                        global_vars[var_name] = c.__name__
-                    else:
-                        global_vars[var_name] = c
-
-                elif var_name == func.__code__.co_name:
-                    global_vars[var_name] = func.__name__
-
-                else:
-                    global_vars[var_name] = func.__globals__[var_name]
-
-        return global_vars
-
-    @classmethod
     def get_object(cls, dictionary, is_dict=False):
-        """
-        Creates object from dictionary
-        """
         if is_dict:
             return {cls.get_object(item[0]): cls.get_object(item[1]) for item in dictionary}
 
@@ -227,52 +99,165 @@ class ObjectConverter:
                 return classmethod(cls.get_object(object_source))
 
             if object_type == FunctionType.__name__:
-                code = cls.get_object(object_source[CODE])
-                global_vars = cls.get_object(object_source[GLOBALS])
-                name = cls.get_object(object_source[NAME])
-                defaults = cls.get_object(object_source[DEFAULTS])
-                closure = cls.get_object(object_source[CLOSURE])
-
-                for key in global_vars:
-                    if key in code.co_name and key in globals():
-                        global_vars[key] = globals()[key]
-
-                func = FunctionType(code, global_vars, name, defaults, closure)
-
-                if func.__name__ in global_vars:
-                    func.__globals__.update({func.__name__: func})
-
-                return func
+                return cls.__create_function(object_source)
 
             if object_type == type.__name__:
-                name = cls.get_object(object_source[NAME])
-                bases = cls.get_object(object_source[BASES])
-                dictionary = object_source[DICT]
-                dictionary = {cls.get_object(key): cls.get_object(
-                    value) for key, value in dictionary.items()}
-
-                cl = type(name, bases, dictionary)
-
-                for attr in cl.__dict__.values():
-                    if inspect.isroutine(attr):
-                        if type(attr) in (staticmethod, classmethod):
-                            fglobs = attr.__func__.__globals__
-                        else:
-                            fglobs = attr.__globals__
-
-                        for gv in fglobs.keys():
-                            if gv == cl.__name__:
-                                fglobs[gv] = cl
-
-                return cl
+                return cls.__create_class(object_source)
 
             else:
-                cl = cls.get_object(object_source[CLASS])
-                dictionary = object_source[DICT]
-                dictionary = {cls.get_object(key): cls.get_object(
-                    value) for key, value in dictionary.items()}
+                return cls.__create_object(object_source)
 
-                obj = object.__new__(cl)
-                obj.__dict__ = dictionary
+    @classmethod
+    def __create_function(cls, object_source):
+        code = cls.get_object(object_source[CODE])
+        global_vars = cls.get_object(object_source[GLOBALS])
+        name = cls.get_object(object_source[NAME])
+        defaults = cls.get_object(object_source[DEFAULTS])
+        closure = cls.get_object(object_source[CLOSURE])
 
-                return obj
+        for key in global_vars:
+            if key in code.co_name and key in globals():
+                global_vars[key] = globals()[key]
+
+        func = FunctionType(code, global_vars, name, defaults, closure)
+
+        if func.__name__ in global_vars:
+            func.__globals__.update({func.__name__: func})
+
+        return func
+
+    @classmethod
+    def __create_class(cls, object_source):
+        name = cls.get_object(object_source[NAME])
+        bases = cls.get_object(object_source[BASES])
+        dictionary = object_source[DICT]
+        dictionary = {cls.get_object(key): cls.get_object(
+            value) for key, value in dictionary.items()}
+
+        cl = type(name, bases, dictionary)
+
+        for attr in cl.__dict__.values():
+            if inspect.isroutine(attr):
+                if type(attr) in (staticmethod, classmethod):
+                    fglobs = attr.__func__.__globals__
+                else:
+                    fglobs = attr.__globals__
+
+                for gv in fglobs.keys():
+                    if gv == cl.__name__:
+                        fglobs[gv] = cl
+
+        return cl
+
+    @classmethod
+    def __create_object(cls, object_source):
+        cl = cls.get_object(object_source[CLASS])
+        dictionary = object_source[DICT]
+        dictionary = {cls.get_object(key): cls.get_object(
+            value) for key, value in dictionary.items()}
+
+        obj = object.__new__(cl)
+        obj.__dict__ = dictionary
+
+        return obj
+
+    @classmethod
+    def __get_code_dict(cls, obj):
+        result = {}
+
+        for key, value in inspect.getmembers(obj):
+            if key in CODE_PROPERTIES:
+                result[key] = cls.get_dict(value)
+
+        return result
+
+    @classmethod
+    def __get_object_dict(cls, obj):
+        result = {}
+
+        # Class
+        result[CLASS] = cls.get_dict(obj.__class__)
+
+        # Dict
+        result[DICT] = cls.__get_obj_dict(obj)
+
+        return result
+
+    @classmethod
+    def __get_routine_dict(cls, obj, is_inner_func):
+        result = {}
+
+        # Code
+        result[CODE] = cls.get_dict(obj.__code__)
+
+        # Global vars
+        global_vars = cls.__get_global_vars(obj, is_inner_func)
+        result[GLOBALS] = cls.get_dict(global_vars)
+
+        # Name
+        result[NAME] = cls.get_dict(obj.__name__)
+
+        # Defaults
+        result[DEFAULTS] = cls.get_dict(obj.__defaults__)
+
+        # Closure
+        result[CLOSURE] = cls.get_dict(obj.__closure__)
+
+        return result
+
+    @classmethod
+    def __get_global_vars(cls, func, is_inner_func):
+        name = func.__name__
+        global_vars = {}
+
+        for var_name in func.__code__.co_names:
+            if var_name in func.__globals__:
+                # Module
+                if type(func.__globals__[var_name]) is ModuleType:
+                    global_vars[var_name] = func.__globals__[var_name]
+
+                # Class
+                elif inspect.isclass(func.__globals__[var_name]):
+                    c = func.__globals__[var_name]
+
+                    if is_inner_func and name in c.__dict__ and func == c.__dict__[name].__func__:
+                        global_vars[var_name] = c.__name__
+                    else:
+                        global_vars[var_name] = c
+
+                elif var_name == func.__code__.co_name:
+                    global_vars[var_name] = func.__name__
+
+                else:
+                    global_vars[var_name] = func.__globals__[var_name]
+
+        return global_vars
+
+    @classmethod
+    def __get_obj_dict(cls, obj):
+        dictionary = {key: value for key, value in obj.__dict__.items()}
+        dictionary2 = {}
+
+        for key, value in dictionary.items():
+            if type(value) not in UNIQUE_TYPES:
+                if inspect.isroutine(value):
+                    dictionary2[cls.get_dict(key)] = cls.get_dict(value, is_inner_func=True)
+                else:
+                    dictionary2[cls.get_dict(key)] = cls.get_dict(value)
+
+        return dictionary2
+
+    @classmethod
+    def __get_class_dict(cls, obj):
+        result = {}
+
+        # Name
+        result[NAME] = cls.get_dict(obj.__name__)
+
+        # Bases
+        result[BASES] = cls.get_dict(tuple(base for base in obj.__bases__ if base != object))
+
+        # Dict
+        result[DICT] = cls.__get_obj_dict(obj)
+
+        return result
