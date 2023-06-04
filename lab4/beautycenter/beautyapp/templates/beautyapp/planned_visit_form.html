@@ -1,0 +1,14 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<h2>Create Planned Visit</h2>
+<div>
+    <form method="POST" action="">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <input type="submit" value="Submit"/>
+    </form>
+</div>
+
+{% endblock %}

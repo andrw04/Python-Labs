@@ -1,0 +1,49 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2">
+            <h3>Categories</h3>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <a href="{% url 'service_list'%}" class="list-group-item list-group-item-action">All</a>
+                </li class="list-group-item">
+                {% for cat in categories %}
+                <li class="list-group-item">
+                    <a href="{{ cat.get_absolute_url }}" class="list-group-item list-group-item-action"> {{ cat.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col">
+            <h3>Services</h3>
+            <div class="row">
+                {% for serv in services %}
+                <div class="card" style="width: 18rem;">
+                    {% if serv.image %}
+                    <img class="card-img-top" src="{{ serv.image.url }}" alt="Card image cap">
+                    {% else %}
+                    <img class="card-img-top" src="https://img.icons8.com/?size=512&id=j1UxMbqzPi7n&format=png" alt="Card image cap">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ serv.name }}</h5>
+                        <p class="card-text">{{ serv.price }} $</p>
+                        <a href="{{ serv.get_absolute_url }}" class="btn btn-primary">Details</a>
+                    </div>
+                </div>
+                <!-- <div class="item">
+                    <a href="{{ serv.get_absolute_url }}">{{serv.name}}</a>
+                    <a>{{serv.price}}</a>
+                </div> -->
+
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

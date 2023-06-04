@@ -1,0 +1,78 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+
+{% if page == 'login' %}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-4">
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="col-md-12">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" name="username" placeholder="Enter Username" /><br>
+                </div>
+
+                <div class="col-md-12">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" placeholder="Enter Password" /><br>
+                </div>
+
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+                <p>Haven't signed up yet?</p>
+                <a href="{% url 'register' %}">Register</a>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+{% else %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-4">
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="col-md-12">
+                    <label for="fname" class="form-label">First Name</label>
+                    {{form.first_name}}
+                </div>
+                <div class="col-md-12">
+                    <label for="lname" class="form-label">Last Name</label>
+                    {{form.last_name}}
+                </div>
+                <div class="col-md-12">
+                    <label for="username" class="form-label">Username</label>
+                    {{form.username}}
+                </div>
+                <div class="col-md-12">
+                    <label for="email" class="form-label">E-mail</label>
+                    {{form.email}}
+                </div>
+                <div class="col-md-12">
+                    <label for="password" class="form-label">Password</label>
+                    {{form.password1}}
+                </div>
+                <div class="col-md-12">
+                    <label for="confirm password" class="form-label">Email</label>
+                    {{form.password2}}
+                </div>
+
+                <div class="col-md-12">
+                    <br>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </div>
+            </form>
+            <p>Already signed up?</p>
+            <a href="{% url 'login' %}">Login</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

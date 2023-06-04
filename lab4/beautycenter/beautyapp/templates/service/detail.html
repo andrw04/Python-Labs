@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+{% load static %}
+{% block title %}
+    {% if category %}{{ category.title }}{% else %}Products{% endif %}
+{% endblock %}
+{% block content %}
+    <div class="product-detail">
+        <img src="{% if service.image %}{{ service.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" height="200" width="200">
+        <h1>{{ product.name }}</h1>
+        <h2><a href="{{ service.category.get_absolute_url }}">{{ service.category }}</a></h2>
+        <p class="price">${{ service.price }}</p>
+        {{ service.description|linebreaks }}
+    </div>
+{% endblock %}
