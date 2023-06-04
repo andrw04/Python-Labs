@@ -1,15 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import CategoryForm, SignupForm
+from .forms import CategoryForm, SignupForm, OrderCreateForm, ProfileForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import *
+from cart.forms import CartAddServiceForm
+from cart.cart import Cart
+
 # Create your views here.
 
 
 def index(request):
-    return render(request, 'index.html', {})
+    return render(request, 'beautyapp/index.html', {})
 
 
 def create_category(request):
@@ -52,7 +55,7 @@ def loginPage(request):
         else:
             messages.error(request, 'Username OR password does not exist...')
     context = {'page': page}
-    return render(request, 'login_register.html', context)
+    return render(request, 'beautyapp/login_register.html', context)
 
 
 def logoutUser(request):
@@ -72,7 +75,7 @@ def registerPage(request):
         else:
             messages.error(request,'An error occured during registration...')
 
-    return render(request, 'login_register.html', {'form': form})
+    return render(request, 'beautyapp/login_register.html', {'form': form})
 
 
 def service_list(request, category_slug=None):
@@ -93,9 +96,30 @@ def service_list(request, category_slug=None):
 
 def service_detail(request, id, slug):
     service = get_object_or_404(Service, id=id, slug=slug, available=True)
-    context = {'service': service}
+    cart_service_form = CartAddServiceForm()
+    context = {'service': service,
+               'cart_service_form': cart_service_form}
 
     return render(request, 'service/detail.html', context)
+
+
+def order_create(request):
+    cart = Cart(request)
+    if request.method == "POST":
+        form = OrderCreateForm(request.POST)
+        if form.is_valid():
+            order = form.save()
+            for item in cart:
+                OrderItem.objects.create(order=order, service=item['service'], price=item['price'])
+
+            # clear cart
+            cart.clear()
+            return render(request, 'orders/order/created.html', {'order': order})
+    else:
+        form = OrderCreateForm()
+    return render(request, 'orders/order/create.html', {'cart':cart, 'form': form})
+
+
 
 
 # def order_create(request):

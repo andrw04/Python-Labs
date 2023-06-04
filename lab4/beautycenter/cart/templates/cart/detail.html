@@ -1,0 +1,54 @@
+{% extends 'beautyapp/index.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content">
+    <div class="row justify-content-center">
+        <div class="col-7">
+
+            <h1>Your order</h1>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Service</th>
+                        <th>Remove</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                    {% with service=item.service %}
+                    <tr>
+                        <td style="width: 25%; height: 25%;">
+                            <a href="{{ service.get_absolute_url }}">
+
+                                <img class="card-img-top" src="{{ service.image.url }}" alt="Card image cap">
+                            </a>
+                        </td>
+                        <td>{{ service.name }}</td>
+                        <td>
+                            <a href="{% url 'cart_remove' service.id %}">Remove</a>
+                        </td>
+                        <td class="num">${{item.price}}</td>
+                    </tr>
+                    {% endwith %}
+                    {% endfor %}
+                    <tr class="total">
+                        <td>Total</td>
+                        <td colspan="2"></td>
+                        <td class="num">${{ cart.get_total_price }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="text-right">
+                <a href="{% url 'service_list' %}" class="button light"> Continue </a>
+                <a href="{% url 'order_create' %}" class="button">
+                    Checkout
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

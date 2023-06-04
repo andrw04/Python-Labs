@@ -1,14 +1,28 @@
-{% extends "index.html" %}
+{% extends "beautyapp/index.html" %}
 {% load static %}
 {% block title %}
-    {% if category %}{{ category.title }}{% else %}Products{% endif %}
+{% if category %}{{ category.title }}{% else %}Categories{% endif %}
 {% endblock %}
 {% block content %}
-    <div class="product-detail">
-        <img src="{% if service.image %}{{ service.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" height="200" width="200">
-        <h1>{{ product.name }}</h1>
-        <h2><a href="{{ service.category.get_absolute_url }}">{{ service.category }}</a></h2>
-        <p class="price">${{ service.price }}</p>
-        {{ service.description|linebreaks }}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-3">
+            <img class="card-img-top" src="{{ service.image.url }}" alt="Card image cap">
+        </div>
+        <div class="col-6 text-align-center">
+            <h2>{{ service.name }}</h2>
+            <h4><a href="{{ service.category.get_absolute_url }}">{{ service.category }}</a></h4>
+            <h2 class="price">${{ service.price }}</h2>
+            <form action="{% url 'cart_add' service.id %}" method="post">
+                {{ cart_service_form }}
+                {% csrf_token %}
+                <input type="submit" value="Add to cart">
+            </form>
+            <p>
+                {{ service.description|linebreaks }}
+            </p>
+        </div>
     </div>
+
+</div>
 {% endblock %}

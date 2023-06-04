@@ -19,3 +19,17 @@ class ServiceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Service, ServiceAdmin)
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    raw_id_fields = ['service']
+
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['id', 'client', 'paid', 'created', 'updated']
+    list_filter = ['paid', 'created', 'updated']
+    inlines = [OrderItemInline]
+
+admin.site.register(Order, OrderAdmin)
+admin.site.register(Profile)

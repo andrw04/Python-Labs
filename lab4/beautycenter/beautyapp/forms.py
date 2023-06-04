@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Category, Service
+from .models import Category, Service, Order, Profile
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -77,6 +77,15 @@ class SignupForm(UserCreationForm):
             'placeholder': 'Enter your email'
         })
 
+        self.fields['address'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Enter your address'
+        })
+        self.fields['birth_date'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Enter your birth date'
+        })
+
         self.fields['password1'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Enter your password'
@@ -91,12 +100,25 @@ class SignupForm(UserCreationForm):
     first_name = forms.CharField(max_length=150)
     last_name = forms.CharField(max_length=150)
     email = forms.EmailField(max_length=150)
+    address = forms.CharField(max_length=150)
+    birth_date = forms.DateField(widget=forms.DateInput)
     password1 = forms.CharField(widget=forms.PasswordInput)
     password2 = forms.CharField(widget=forms.PasswordInput)
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+        fields = ['username', 'first_name', 'last_name', 'email','address','birth_date', 'password1', 'password2']
 
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('address', 'birth_date')
+
+
+class OrderCreateForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['client']
     
 # class OrderCreateForm(forms.ModelForm):
 #     class Meta:
