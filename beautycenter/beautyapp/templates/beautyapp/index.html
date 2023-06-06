@@ -1,0 +1,27 @@
+{% extends 'beautyapp/base.html' %}
+
+{% block content %}
+<div class="content-fluent">
+    <div class="shadow p-4 mb-5 bg-body rounded">
+        <h1>Simple Django Site For Beauty Clinic</h1>
+    </div>
+</div>
+{% if request.user.is_authenticated %}
+
+<div class="content-fluent">
+    <div class="shadow p-4 mb-5 bg-body rounded">
+        <div class="row jystify-content-center">
+            <div class="col-6">
+                <h3>{{ name }}</h3>
+                <h3>{{ current_time }}</h3>
+            </div>
+            <div class="col-6">
+                <h3>Quote of day:</h3>
+                <h3>{{ author }}</h3>
+                <h3>{{ quote }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

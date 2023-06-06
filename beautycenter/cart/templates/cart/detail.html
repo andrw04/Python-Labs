@@ -1,0 +1,60 @@
+{% extends 'beautyapp/base.html' %}
+
+{% block content %}
+<div class="content-fluent">
+    <div class="row justify-content-center">
+        <div class="col-5">
+            <h1>Your shopping cart</h1>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Remove</th>
+                    <th>Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in cart %}
+                {% with service=item.service %}
+                <tr>
+                    {% if service.image %}
+                    <td>
+                        <img class="w-25 p-3" src="{{ service.image.url }}">
+                    </td>
+                    {% endif %}
+                    <td>{{ service.name }}</td>
+                    {% if service.id %}
+                    <td><a href="{% url 'cart:cart_remove' service.id %}">Remove</a></td>
+                    {% endif %}
+                    <td class="num">${{ item.price }}</td>
+                </tr>
+                {% endwith %}
+                {% endfor %}
+                <tr class="total">
+                    <td>Total</td>
+                    <td colspan="2"></td>
+                    <td class="num">${{ cart.get_total_price }}</td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-2">
+            <ul class="list-group list-group-horizontal">
+                <li class="list-group-item">
+                    <a href="{% url 'service_list' %}" class="button light">Continue shopping</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'orders:order_create' %}" class="button light">Checkout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

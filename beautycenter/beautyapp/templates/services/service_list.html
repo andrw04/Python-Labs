@@ -1,0 +1,82 @@
+{% extends 'beautyapp/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-2">
+            <h1>Categories</h1>
+
+
+            <div class="shadow p-4 mb-5 bg-body rounded">
+                <ul>
+                    <li class="list-group-item">
+                        <a href="{% url 'service_list' %}"
+                           class="list-group-item list-group-item-action">All</a>
+                    </li>
+                    {% for category in categories %}
+                    <br>
+                    <li class="list-group-item">
+                        <a href="{{ category.get_absolute_url }}"
+                           class="list-group-item list-group-item-action"> {{ category.name }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <br>
+                <h2>Sort by</h2>
+                <form action="{{ request.get_full_path }}" method="get">
+                    <button class="badge rounded-pill text-bg-success" name="sort" type="submit"
+                            value="price_ascending">Price
+                        ascending
+                    </button>
+                    <br>
+                    <button class="badge rounded-pill text-bg-success" name="sort" type="submit"
+                            value="price_descending">Price
+                        descending
+                    </button>
+                    <br>
+                    <button class="badge rounded-pill text-bg-success" name="sort" type="submit" value="name_ascending">
+                        Name
+                        ascending
+                    </button>
+                    <br>
+                    <button class="badge rounded-pill text-bg-success" name="sort" type="submit"
+                            value="name_descending">Name
+                        descending
+                    </button>
+                </form>
+            </div>
+
+
+        </div>
+        <div class="col-9">
+            <h1>Services</h1>
+            {% for service in services %}
+            <div class="shadow p-4 mb-5 bg-body rounded">
+                <div class="row">
+                    <div class="col-2">
+                        {% if service.image %}
+                        <img class="card-img-top" src="{{ service.image.url }}" alt="Card image cap">
+                        {% endif %}
+                    </div>
+                    <div class="col-10">
+                        <h5>{{ service.name }}</h5>
+                        <p>{{ service.description }}</p>
+                        <p>{{ service.price }} $</p>
+                        <form action="{% url 'cart:cart_add' service.id %}" method="post">
+                        {{ cart_product_form }}
+                        {% csrf_token %}
+                        <input type="submit" value="Add to cart" class="btn btn-success">
+                        </form>
+                        <br>
+                        {% if request.user.is_superuser %}
+                        <a href="{% url 'delete_service' service.id %}" class="btn btn-danger">Delete</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

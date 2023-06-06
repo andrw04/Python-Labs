@@ -1,0 +1,22 @@
+{% extends 'beautyapp/base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-center">
+        <div class="col">
+            <h1>Clients</h1>
+            {% for client in clients %}
+            <div class="shadow p-4 mb-5 bg-body rounded">
+                <h2>First Name: {{ client.first_name }}</h2>
+                <h2>Last Name: {{ client.last_name }}</h2>
+                <h4>Email: {{ client.email }}</h4>
+                <h4>Address: {{ client.address }}</h4>
+                <h4>Mobile: {{ client.mobile }}</h4>
+                <a href="{% url 'delete_client' client.id %}" class="btn btn-danger">Delete</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+    {% endblock %}

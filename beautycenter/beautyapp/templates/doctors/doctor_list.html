@@ -1,0 +1,30 @@
+{% extends 'beautyapp/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-9">
+            <h1>Doctors</h1>
+            {% for doctor in doctors %}
+            <div class="shadow p-4 mb-5 bg-body rounded">
+                <div class="row">
+                    <div class="col-2">
+                        {% if doctor.image %}
+                        <img class="card-img-top" src="{{ doctor.image.url }}" alt="Card image cap">
+                        {% endif %}
+                    </div>
+                    <div class="col-10">
+                        <h3>First Name: {{ doctor.first_name }}</h3>
+                        <h3>Last Name: {{ doctor.last_name }}</h3>
+                        <h6>Category: {{ doctor.category }}</h6>
+                        <br>
+                        <a href="{% url 'delete_doctor' doctor.id %}" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

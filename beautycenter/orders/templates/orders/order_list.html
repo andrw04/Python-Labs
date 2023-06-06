@@ -1,0 +1,27 @@
+{% extends 'beautyapp/base.html' %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-center">
+        <div class="col">
+            <h1>Orders</h1>
+            {% for order in orders %}
+            <div class="shadow p-4 mb-5 bg-body rounded">
+                <h2>Client:</h2>
+                <h4>First Name: {{ order.first_name }}</h4>
+                <h4>Last Name: {{ order.last_name }}</h4>
+                <h4>Email: {{ order.email }}</h4>
+                <h4>Address: {{ order.address }}</h4>
+                <h4>Mobile: {{ order.mobile }}</h4>
+                <h2>Order Number: {{ order.id }}</h2>
+                <h2>Created: {{ order.created }}</h2>
+                <a href="{% url 'orders:delete_order' order.id %}" class="btn btn-danger">Delete</a>
+            </div>
+
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
