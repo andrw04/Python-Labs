@@ -34,6 +34,7 @@ class Client(models.Model):
 class Doctor(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
+    birth_date = models.DateField()
     image = models.ImageField(
         upload_to='images/%Y/%m/%d', blank=True, null=True, default='images/no_image.png')
     category = models.CharField(max_length=50)

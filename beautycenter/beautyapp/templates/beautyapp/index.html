@@ -21,7 +21,52 @@
                 <h3>{{ quote }}</h3>
             </div>
         </div>
+        <br>
+        <div class="row justify-content-center">
+            <div class="col-6">
+
+            </div>
+            <div class="col-6">
+                <canvas id="myChart"></canvas>
+            </div>
+
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+    x = [{% for label in labels %} '{{ label }}', {% endfor %}]
+    y = [{% for dat in data %} '{{ dat }}', {% endfor %}]
+      const ctx = document.getElementById('myChart');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: x,
+          datasets: [{
+            label: '# of Orders',
+            data: y,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+
+        </script>
     </div>
 </div>
+
+<div class="container">
+
+</div>
+
+
 {% endif %}
 {% endblock %}

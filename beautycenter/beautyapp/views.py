@@ -3,8 +3,10 @@ from django.contrib import messages
 from cart.forms import CartAddServiceForm
 from .models import Service, Category, Client, Doctor
 from .forms import ServiceForm, CategoryForm, DoctorForm
+from orders.models import OrderItem
 from requests import get
 import json
+from django.db.models import Count
 
 
 def service_list(request, category_slug=None):
@@ -126,6 +128,14 @@ def delete_doctor(request, doctor_id):
 
 
 def index(request):
+    # statistics
+    slabels = []
+    sdata = []
+    services = Service.objects.annotate(number_of_orders=Count('order_items'))
+    for service in services:
+        slabels.append(service.name)
+        sdata.append(service.number_of_orders)
+
     # first api
     key = '2862bdc96c3f4b79a0bbf519bcb8f1df'
     data = json.loads(get(f'https://api.ipgeolocation.io/ipgeo?apiKey={key}').text)['time_zone']
@@ -134,6 +144,8 @@ def index(request):
         'author': result.get('quote').get('author'),
         'quote': result.get('quote').get('body'),
         'name': data.get('name'),
-        'current_time': data.get('current_time')
+        'current_time': data.get('current_time'),
+        'labels': slabels,
+        'data': sdata,
     }
     return render(request, 'beautyapp/index.html', context)
